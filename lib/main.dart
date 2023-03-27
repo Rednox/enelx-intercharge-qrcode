@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 
 void main() {
   runApp(const EnelXInterchargeQrCode());
@@ -51,7 +51,8 @@ class QRCodeSelectPage extends StatefulWidget {
 }
 
 class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
-  String result = '';
+  final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
+  String? code;
 
   @override
   Widget build(BuildContext context) {
@@ -88,22 +89,19 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
-              onPressed: () async {
-                var res = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SimpleBarcodeScannerPage(),
-                    ));
-                setState(() {
-                  if (res is String) {
-                    result = res;
-                    Clipboard.setData(ClipboardData(text: result));
-                  }
-                });
-              },
-              child: const Text('Open Scanner'),
-            ),
-            Text('Barcode Result: $result'),
+                onPressed: () {
+                  _qrBarCodeScannerDialogPlugin.getScannedQrBarCode(
+                      context: context,
+                      onCode: (code) {
+                        setState(() {
+                          this.code = code;
+                          if (this.code is String) {
+                            Clipboard.setData(ClipboardData(text: this.code));
+                          }
+                        });
+                      });
+                },
+                child: Text(code ?? "Scan Intercharge QR Code")),
           ],
         ),
       ),
