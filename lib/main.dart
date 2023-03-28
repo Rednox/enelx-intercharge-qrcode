@@ -140,7 +140,6 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
         id = match.group(4)!;
 
         return operatorId +
-            enelxSeperator(seperator) +
             countryCode +
             enelxSeperator(seperator) +
             operatorId +
