@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
+import 'package:rich_clipboard/rich_clipboard.dart';
 
 void main() {
   runApp(const EnelXInterchargeQrCode());
@@ -99,8 +100,10 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
                         this.code = code;
                         if (this.code is String) {
                           evseId = extractEvseId(this.code);
-                          Clipboard.setData(ClipboardData(text: evseId))
-                              .then((_) {
+                          final RichClipboardData data = RichClipboardData(
+                            text: evseId,
+                          );
+                          RichClipboard.setData(data).then((_) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content:
