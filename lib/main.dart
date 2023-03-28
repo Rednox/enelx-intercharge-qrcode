@@ -102,6 +102,7 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
                           evseId = extractEvseId(this.code);
                           final RichClipboardData data = RichClipboardData(
                             text: evseId,
+                            html: '<html><body>$evseId</body></html>',
                           );
                           RichClipboard.setData(data).then((_) {
                             ScaffoldMessenger.of(context).showSnackBar(
