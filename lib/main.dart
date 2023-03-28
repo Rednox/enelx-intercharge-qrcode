@@ -13,7 +13,7 @@ class EnelXInterchargeQrCode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Enel X Intercharge QR Code',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -53,6 +53,7 @@ class QRCodeSelectPage extends StatefulWidget {
 class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
   final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
   String? code;
+  String evseId = "";
 
   @override
   Widget build(BuildContext context) {
@@ -88,23 +89,76 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const Spacer(),
             ElevatedButton(
-                onPressed: () {
-                  _qrBarCodeScannerDialogPlugin.getScannedQrBarCode(
-                      context: context,
-                      onCode: (code) {
-                        setState(() {
-                          this.code = code;
-                          if (this.code is String) {
-                            Clipboard.setData(ClipboardData(text: this.code));
-                          }
-                        });
+              onPressed: () {
+                _qrBarCodeScannerDialogPlugin.getScannedQrBarCode(
+                    context: context,
+                    onCode: (code) {
+                      setState(() {
+                        this.code = code;
+                        if (this.code is String) {
+                          evseId = extractEvseId(this.code);
+                          Clipboard.setData(ClipboardData(text: evseId))
+                              .then((_) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text("EVSE ID copied to clipboard")));
+                          });
+                        }
                       });
-                },
-                child: Text(code ?? "Scan Intercharge QR Code")),
+                    });
+              },
+              child: const Text("Scan Intercharge QR Code"),
+            ),
+            const Spacer(),
+            SelectableText(evseId),
+            const Spacer(),
           ],
         ),
       ),
     );
+  }
+
+  String extractEvseId(String? code) {
+    final evseIdRegExp =
+        RegExp(r'([A-Za-z]{2})(\*?)([A-Za-z0-9]{3})\*?(E[A-Za-z0-9\*]{1,30})');
+    // final countryCodeRegExp = RegExp(r'^\[:\.\]$');
+    // final operatorIdRegExp = RegExp(r'^\[:\.\]$');
+    // final idRegExp = RegExp(r'^\[:\.\]$');
+    String countryCode = "";
+    String? seperator;
+    String operatorId = "";
+    String id = "";
+    if (code is String) {
+      final match = evseIdRegExp.firstMatch(code);
+      if (match?.group(0) is String) {
+        countryCode = match!.group(1)!;
+        seperator = match.group(2);
+        operatorId = match.group(3)!;
+        id = match.group(4)!;
+
+        return operatorId +
+            enelxSeperator(seperator) +
+            countryCode +
+            enelxSeperator(seperator) +
+            operatorId +
+            enelxSeperator(seperator) +
+            replaceEnelXSeperatorFromId(id);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("No EVSE ID found!")));
+      }
+    }
+    return "";
+  }
+
+  String enelxSeperator(String? seperator) {
+    return seperator is String ? "S" : "";
+  }
+
+  String replaceEnelXSeperatorFromId(String id) {
+    return id.replaceAll(RegExp(r'\*'), "S");
   }
 }
