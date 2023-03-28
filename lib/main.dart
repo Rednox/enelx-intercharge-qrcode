@@ -106,7 +106,7 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
               child: const Text("Scan Intercharge QR Code"),
             ),
             const Spacer(),
-            SelectableText(evseId),
+            Text("Scanned EVSE ID: $evseId"),
             const Spacer(),
             (evseId != ""
                 ? ElevatedButton(
@@ -130,9 +130,6 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
   String extractEvseId(String? code) {
     final evseIdRegExp =
         RegExp(r'([A-Za-z]{2})(\*?)([A-Za-z0-9]{3})\*?(E[A-Za-z0-9\*]{1,30})');
-    // final countryCodeRegExp = RegExp(r'^\[:\.\]$');
-    // final operatorIdRegExp = RegExp(r'^\[:\.\]$');
-    // final idRegExp = RegExp(r'^\[:\.\]$');
     String countryCode = "";
     String? seperator;
     String operatorId = "";
