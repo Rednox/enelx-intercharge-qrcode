@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
-import 'package:rich_clipboard/rich_clipboard.dart';
 
 void main() {
   runApp(const EnelXInterchargeQrCode());
@@ -100,16 +99,6 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
                         this.code = code;
                         if (this.code is String) {
                           evseId = extractEvseId(this.code);
-                          final RichClipboardData data = RichClipboardData(
-                            text: evseId,
-                            html: '<html><body>$evseId</body></html>',
-                          );
-                          RichClipboard.setData(data).then((_) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text("EVSE ID copied to clipboard")));
-                          });
                         }
                       });
                     });
@@ -118,6 +107,19 @@ class _QRCodeSelectPageState extends State<QRCodeSelectPage> {
             ),
             const Spacer(),
             SelectableText(evseId),
+            const Spacer(),
+            (evseId != ""
+                ? ElevatedButton(
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: evseId)).then((_) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("EVSE ID copied to clipboard")));
+                      });
+                    },
+                    child: const Text("Copy EVSE ID to clipboard"),
+                  )
+                : const Spacer()),
             const Spacer(),
           ],
         ),
